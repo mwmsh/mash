@@ -114,6 +114,7 @@ VERSPROG = bashversion$(EXEEXT)
 VERSOBJ = bashversion.$(OBJEXT)
 
 Program = bash$(EXEEXT)
+StaticLibrary = libbash.a
 Version = @BASHVERS@
 PatchLevel = `$(BUILD_DIR)/$(VERSPROG) -p`
 RELSTATUS = @RELSTATUS@
@@ -627,10 +628,16 @@ LOADABLES_DIR = ${top_builddir}/examples/loadables
 # Keep GNU Make from exporting the entire environment for small machines.
 .NOEXPORT:
 
-.made: $(Program) bashbug $(SUPPORT_DIR)/man2html$(EXEEXT)
+.made: $(StaticLibrary) $(Program) bashbug $(SUPPORT_DIR)/man2html$(EXEEXT)
 	@echo "$(Program) last made for a $(Machine) running $(OS)" >.made
 
-$(Program): $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
+$(StaticLibrary): $(OBJECTS) .build
+	echo $(OBJECTS)
+	$(RM) $@
+	$(AR) rcs $@ $(OBJECTS)
+	-$(RANLIB) $@
+
+$(Program): $(StaticLibrary) $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
 	$(RM) $@
 	$(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LDFLAGS) -o $(Program) $(OBJECTS) $(LIBS)
 	ls -l $(Program)
