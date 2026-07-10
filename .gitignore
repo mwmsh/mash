@@ -120,3 +120,8 @@ bash/examples/loadables/unlink
 bash/examples/loadables/whoami
 
 target
+/.idea/.gitignore
+/.idea/mash.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
