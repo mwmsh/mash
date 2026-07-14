@@ -64,7 +64,7 @@ pub struct CargoLinker;
 
 impl CargoLinker {
     pub fn register_search_dir(&self, dir: &Path) {
-        // Printing this in builld.rs leads cargo to use the passed dir as a link search dir
+        // Printing this in build.rs leads cargo to use the passed dir as a link search dir
         println!("cargo:rustc-link-search=native={}", dir.display())
     }
 
@@ -81,17 +81,17 @@ impl LinkManifest {
     pub fn from_flags(flags: &str) -> LinkManifest {
         let params: Vec<&str> = flags.split_whitespace().collect();
 
-        let mut libs: Vec<String> = vec![];
-        let mut paths: Vec<String> = vec![];
-        let mut frameworks: Vec<String> = vec![];
+        let mut libs: Vec<String> = Vec::new();
+        let mut paths: Vec<String> = Vec::new();
+        let mut frameworks: Vec<String> = Vec::new();
         let mut idx = 0;
         while idx < params.len() {
-            let param = &params[idx];
+            let param = params[idx];
             if param.starts_with("-l") {
                 libs.push(param[2..].to_string());
             } else if param.starts_with("lib/") || param.starts_with("lib\\") {
                 let (parent, name) = Self::parse_lib(param);
-                if name.len() == 0 {
+                if name.is_empty() {
                     panic!("Invalid lib name for lib {param}");
                 }
                 libs.push(name);
@@ -106,8 +106,8 @@ impl LinkManifest {
                 let param = &params[idx];
                 frameworks.push(param[4..].to_string())
             } else {
-                println!(
-                    "Warning: no rules to parse linker arg {}. \
+                eprintln!(
+                    "warning: no rules to parse linker arg {}. \
                     If this is a necessary linker arg, add parse logic to LinkManifest::from_flags",
                     params[idx]
                 )
@@ -123,16 +123,19 @@ impl LinkManifest {
         }
     }
 
-    fn parse_lib(param: &&str) -> (String, String) {
+    fn parse_lib(param: &str) -> (String, String) {
         let path = PathBuf::from(param);
+
         let parent: String = path.parent().unwrap().display().to_string();
-        let mut name = path.file_name().unwrap().display().to_string();
-        if name.ends_with(".a") {
-            name = name.replace(".a", "");
-        }
-        if name.starts_with("lib") {
-            name = name.replace("lib", "");
-        }
+        let file = path.file_name().unwrap().to_str().unwrap();
+
+        let name = file
+            .strip_suffix(".a")
+            .expect("library must end with .a")
+            .strip_prefix("lib")
+            .expect("library name must start with 'lib'")
+            .to_owned();
+
         (parent, name)
     }
 }
