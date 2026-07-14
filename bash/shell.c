@@ -368,10 +368,10 @@ _cygwin32_check_tmp (void)
 #if defined (NO_MAIN_ENV_ARG)
 /* systems without third argument to main() */
 int
-main (int argc, char **argv)
+common_main (int argc, char **argv)
 #else /* !NO_MAIN_ENV_ARG */
 int
-main (int argc, char **argv, char **env)
+common_main (int argc, char **argv, char **env)
 #endif /* !NO_MAIN_ENV_ARG */
 {
   register int i;
@@ -2130,13 +2130,24 @@ run_shopt_alist (void)
 
 #if defined (NO_MAIN_ENV_ARG)
 int
-bash_main(int argc, char **argv){
-    return main(argc, argv);
+main(int argc, char **argv){
+    return common_main(argc, argv);
 }
 #else
 int
-bash_main(int argc, char **argv, char **env)
+main(int argc, char **argv, char **env)
 {
-    return main(argc, argv, env);
+    return common_main(argc, argv, env);
 }
 #endif
+
+
+int
+bash_main(int argc, char **argv, char **env){
+#if defined NO_MAIN_ENV_ARG
+    environ = env;
+    return common_main(argc, argv);
+#else
+    return common_main(argc, argv, env);
+#endif
+}

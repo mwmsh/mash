@@ -637,11 +637,14 @@ $(StaticLibrary): $(OBJECTS) .build
 	$(AR) rcs $@ $(OBJECTS)
 	-$(RANLIB) $@
 
-$(Program): $(StaticLibrary) $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
+$(Program): flags.txt $(StaticLibrary) $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
 	$(RM) $@
 	$(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LDFLAGS) -o $(Program) $(OBJECTS) $(LIBS)
 	ls -l $(Program)
 	-$(SIZE) $(Program)
+
+flags.txt:
+	echo $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LIBS) $(LDFLAGS)>> flags.txt
 
 .build:	$(SOURCES) config.h Makefile $(DEFDIR)/builtext.h version.h $(VERSPROG)
 	@echo
