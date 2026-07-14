@@ -637,9 +637,9 @@ $(StaticLibrary): $(OBJECTS) .build
 	$(AR) rcs $@ $(OBJECTS)
 	-$(RANLIB) $@
 
-$(Program): flags.txt $(StaticLibrary) $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
+$(Program): flags.txt $(StaticLibrary) main.o $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
 	$(RM) $@
-	$(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LDFLAGS) -o $(Program) $(OBJECTS) $(LIBS)
+	$(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LDFLAGS) -o $(Program) main.o $(OBJECTS) $(LIBS)
 	ls -l $(Program)
 	-$(SIZE) $(Program)
 

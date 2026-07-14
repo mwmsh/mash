@@ -8,5 +8,5 @@ fn main() {
 
     let exit_code = bash_adapter::main(args, vars);
 
-    std::process::exit(exit_code)
+    std::process::exit(exit_code);
 }

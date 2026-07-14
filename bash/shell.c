@@ -2128,19 +2128,6 @@ run_shopt_alist (void)
   shopt_ind = shopt_len = 0;
 }
 
-#if defined (NO_MAIN_ENV_ARG)
-int
-main(int argc, char **argv){
-    return common_main(argc, argv);
-}
-#else
-int
-main(int argc, char **argv, char **env)
-{
-    return common_main(argc, argv, env);
-}
-#endif
-
 
 int
 bash_main(int argc, char **argv, char **env){
