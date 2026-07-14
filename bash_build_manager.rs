@@ -3,7 +3,7 @@ use std::process::Command;
 
 mod filesystem {
     use std::fs;
-    use std::path::{Path};
+    use std::path::Path;
 
     pub fn read_utf8_file(name: &Path) -> String {
         let error = format!("Failed to read file {}", name.display());
@@ -89,6 +89,8 @@ impl LinkManifest {
             let param = &params[idx];
             if param.starts_with("-l") {
                 libs.push(param[2..].to_string());
+            } else if param.starts_with("lib/") {
+                libs.push(param.to_string());
             } else if param.starts_with("-L") {
                 paths.push(param[2..].to_string());
             } else if param.starts_with("-Wl,-framework") {
@@ -152,7 +154,11 @@ impl BashBuildManager {
             .status()
             .expect("failed to execute make");
 
-        assert!(status.success(), "make returned a non-zero exit code {}", status.code().unwrap())
+        assert!(
+            status.success(),
+            "make returned a non-zero exit code {}",
+            status.code().unwrap()
+        )
     }
 
     pub fn run(&self) {
