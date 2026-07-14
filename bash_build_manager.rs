@@ -47,9 +47,9 @@ impl BuildConfig {
         let libs: Vec<String> = [
             "intl", "malloc", "termcap", "glob", "readline", "sh", "tilde",
         ]
-            .iter()
-            .map(|s| s.to_string())
-            .collect();
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
 
         Self {
             src_dir,
@@ -89,20 +89,13 @@ impl LinkManifest {
             let param = &params[idx];
             if param.starts_with("-l") {
                 libs.push(param[2..].to_string());
-            } else if param.starts_with("lib/") {
-                let path = PathBuf::from(param);
-                let parent: String = path.parent().unwrap().display().to_string();
-                let mut name = path.file_name().unwrap().display().to_string();
-                if name.ends_with(".a") {
-                    name = name.replace(".a", "");
+            } else if param.starts_with("lib/") || param.starts_with("lib\\") {
+                let (parent, name) = Self::parse_lib(param);
+                if name.len() == 0 {
+                    panic!("Invalid lib name for lib {param}");
                 }
-                if name.starts_with("lib") {
-                    name = name.replace("lib", "");
-                }
-                if name.len() > 0 {
-                    libs.push(name);
-                    paths.push(parent);
-                }
+                libs.push(name);
+                paths.push(parent);
             } else if param.starts_with("-L") {
                 paths.push(param[2..].to_string());
             } else if param.starts_with("-Wl,-framework") {
@@ -112,6 +105,12 @@ impl LinkManifest {
                 }
                 let param = &params[idx];
                 frameworks.push(param[4..].to_string())
+            } else {
+                println!(
+                    "Warning: no rules to parse linker arg {}. \
+                    If this is a necessary linker arg, add parse logic to LinkManifest::from_flags",
+                    params[idx]
+                )
             }
 
             idx += 1;
@@ -122,6 +121,19 @@ impl LinkManifest {
             paths,
             frameworks,
         }
+    }
+
+    fn parse_lib(param: &&str) -> (String, String) {
+        let path = PathBuf::from(param);
+        let parent: String = path.parent().unwrap().display().to_string();
+        let mut name = path.file_name().unwrap().display().to_string();
+        if name.ends_with(".a") {
+            name = name.replace(".a", "");
+        }
+        if name.starts_with("lib") {
+            name = name.replace("lib", "");
+        }
+        (parent, name)
     }
 }
 
