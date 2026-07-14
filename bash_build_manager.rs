@@ -169,7 +169,10 @@ impl BashBuildManager {
     }
 
     fn link(&self) {
+        println!("Linking mash...");
         let flags = filesystem::read_utf8_file(&self.config.build_dir.join("flags.txt"));
+        println!("Flags.txt:");
+        println!("{flags}");
         let manifest = LinkManifest::from_flags(&flags);
 
         self.linker.register_search_dir(&self.config.build_dir);
