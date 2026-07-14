@@ -90,7 +90,16 @@ impl LinkManifest {
             if param.starts_with("-l") {
                 libs.push(param[2..].to_string());
             } else if param.starts_with("lib/") {
-                libs.push(param.to_string());
+                let mut name: String = param.split("/").last().unwrap().to_string();
+                if name.ends_with(".a") {
+                    name = name.replace(".a", "");
+                }
+                if name.starts_with("lib"){
+                    name = name.replace("lib", "");
+                }
+                if name.len() > 0 {
+                    libs.push(name);
+                }
             } else if param.starts_with("-L") {
                 paths.push(param[2..].to_string());
             } else if param.starts_with("-Wl,-framework") {
