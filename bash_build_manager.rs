@@ -47,9 +47,9 @@ impl BuildConfig {
         let libs: Vec<String> = [
             "intl", "malloc", "termcap", "glob", "readline", "sh", "tilde",
         ]
-        .iter()
-        .map(|s| s.to_string())
-        .collect();
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
 
         Self {
             src_dir,
@@ -90,15 +90,18 @@ impl LinkManifest {
             if param.starts_with("-l") {
                 libs.push(param[2..].to_string());
             } else if param.starts_with("lib/") {
-                let mut name: String = param.split("/").last().unwrap().to_string();
+                let path = PathBuf::from(param);
+                let parent: String = path.parent().unwrap().display().to_string();
+                let mut name = path.file_name().unwrap().display().to_string();
                 if name.ends_with(".a") {
                     name = name.replace(".a", "");
                 }
-                if name.starts_with("lib"){
+                if name.starts_with("lib") {
                     name = name.replace("lib", "");
                 }
                 if name.len() > 0 {
                     libs.push(name);
+                    paths.push(parent);
                 }
             } else if param.starts_with("-L") {
                 paths.push(param[2..].to_string());
