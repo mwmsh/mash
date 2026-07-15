@@ -1,6 +1,6 @@
-use std::env::{Args, Vars};
 use crate::ffi;
 use crate::ffi::ds::CArray;
+use std::env::{Args, Vars};
 use std::ffi::c_int;
 
 pub fn main(argv: Args, env: Vars) -> i32 {

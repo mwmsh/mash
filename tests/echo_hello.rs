@@ -1,8 +1,8 @@
-use std::process::{Command, Stdio};
 use std::io::Write;
+use std::process::{Command, Stdio};
 
 #[test]
-fn echo_works(){
+fn echo_works() {
     let output = Command::new(env!("CARGO_BIN_EXE_mash"))
         .args(["-c", "echo 'hello world'"])
         .output()
