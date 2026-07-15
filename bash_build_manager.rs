@@ -88,7 +88,7 @@ impl LinkManifest {
         while idx < params.len() {
             let param = params[idx];
             if param.starts_with("-l") {
-                libs.push(param[2..].to_string());
+                libs.push(param.strip_prefix("-l").unwrap().to_string());
             } else if param.starts_with("lib/") || param.starts_with("lib\\") {
                 let (parent, name) = Self::parse_lib(param);
                 if name.is_empty() {
@@ -97,14 +97,14 @@ impl LinkManifest {
                 libs.push(name);
                 paths.push(parent);
             } else if param.starts_with("-L") {
-                paths.push(param[2..].to_string());
+                paths.push(param.strip_prefix("-L").unwrap().to_string());
             } else if param.starts_with("-Wl,-framework") {
                 idx += 1;
                 if idx >= params.len() {
                     panic!("End of params encountered before framework name");
                 }
                 let param = &params[idx];
-                frameworks.push(param[4..].to_string())
+                frameworks.push(param.strip_prefix("-Wl,").unwrap().to_string())
             } else {
                 eprintln!(
                     "warning: no rules to parse linker arg {}. \
